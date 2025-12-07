@@ -1,23 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mein Klick-Spiel</title>
+  <title>Fang das Quadrat!</title>
+  <style>
+    canvas { 
+      background: #222; 
+      display: block; 
+      margin: 0 auto; 
+    }
+  </style>
 </head>
 <body>
-  <h1>Willkommen zu meinem Klick-Spiel!</h1>
-  <p>Klicke auf den Button, um Punkte zu sammeln:</p>
-  <button id="clickButton">Klick mich!</button>
-  <p>Punkte: <span id="score">0</span></p>
+  <h1 style="text-align:center; color:white;">Fang das Quadrat!</h1>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <p style="text-align:center; color:white;">Punkte: <span id="score">0</span></p>
 
   <script>
-    let score = 0;
-    const button = document.getElementById('clickButton');
-    const scoreDisplay = document.getElementById('score');
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-    button.addEventListener('click', () => {
-      score++;
-      scoreDisplay.textContent = score;
+    let player = { x: 180, y: 180, size: 20 };
+    let target = { x: Math.random() * 380, y: Math.random() * 380, size: 20 };
+    let score = 0;
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "ArrowUp") player.y -= 10;
+      if(e.key === "ArrowDown") player.y += 10;
+      if(e.key === "ArrowLeft") player.x -= 10;
+      if(e.key === "ArrowRight") player.x += 10;
+      checkCollision();
     });
+
+    function checkCollision() {
+      if(player.x < target.x + target.size &&
+         player.x + player.size > target.x &&
+         player.y < target.y + target.size &&
+         player.y + player.size > target.y) {
+        score++;
+        document.getElementById("score").textContent = score;
+        target.x = Math.random() * 380;
+        target.y = Math.random() * 380;
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "lime";
+      ctx.fillRect(player.x, player.y, player.size, player.size);
+      ctx.fillStyle = "red";
+      ctx.fillRect(target.x, target.y, target.size, target.size);
+      requestAnimationFrame(draw);
+    }
+
+    draw();
   </script>
 </body>
 </html>
