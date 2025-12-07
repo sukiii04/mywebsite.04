@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Meine Website</title>
+  <title>Mein Klick-Spiel</title>
 </head>
 <body>
-    <h1>Hallo! Willkommen auf meiner Website 😄</h1>
-    <p>Hier kommt später mein Spiel hin!</p>
+  <h1>Willkommen zu meinem Klick-Spiel!</h1>
+  <p>Klicke auf den Button, um Punkte zu sammeln:</p>
+  <button id="clickButton">Klick mich!</button>
+  <p>Punkte: <span id="score">0</span></p>
+
+  <script>
+    let score = 0;
+    const button = document.getElementById('clickButton');
+    const scoreDisplay = document.getElementById('score');
+
+    button.addEventListener('click', () => {
+      score++;
+      scoreDisplay.textContent = score;
+    });
+  </script>
 </body>
 </html>
