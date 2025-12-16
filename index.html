@@ -1,58 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-  <title>Fang das Quadrat!</title>
-  <style>
-    canvas { 
-      background: #222; 
-      display: block; 
-      margin: 0 auto; 
+<meta charset="UTF-8">
+<title>Snake Game</title>
+<style>
+    body {
+        background: #111;
+        color: white;
+        text-align: center;
+        font-family: Arial;
     }
-  </style>
+    canvas {
+        background: black;
+        margin-top: 20px;
+        border: 2px solid white;
+    }
+</style>
 </head>
 <body>
-  <h1 style="text-align:center; color:white;">Fang das Quadrat!</h1>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-  <p style="text-align:center; color:white;">Punkte: <span id="score">0</span></p>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+<h1>🐍 Snake Game</h1>
+<p>Pfeiltasten benutzen</p>
 
-    let player = { x: 180, y: 180, size: 20 };
-    let target = { x: Math.random() * 380, y: Math.random() * 380, size: 20 };
-    let score = 0;
+<canvas id="game" width="400" height="400"></canvas>
 
-    document.addEventListener("keydown", (e) => {
-      if(e.key === "ArrowUp") player.y -= 10;
-      if(e.key === "ArrowDown") player.y += 10;
-      if(e.key === "ArrowLeft") player.x -= 10;
-      if(e.key === "ArrowRight") player.x += 10;
-      checkCollision();
-    });
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-    function checkCollision() {
-      if(player.x < target.x + target.size &&
-         player.x + player.size > target.x &&
-         player.y < target.y + target.size &&
-         player.y + player.size > target.y) {
-        score++;
-        document.getElementById("score").textContent = score;
-        target.x = Math.random() * 380;
-        target.y = Math.random() * 380;
-      }
+const box = 20;
+let snake = [{x: 200, y: 200}];
+let direction = "RIGHT";
+
+let food = {
+    x: Math.floor(Math.random() * 20) * box,
+    y: Math.floor(Math.random() * 20) * box
+};
+
+document.addEventListener("keydown", dir);
+
+function dir(event) {
+    if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+    if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "lime" : "green";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "lime";
-      ctx.fillRect(player.x, player.y, player.size, player.size);
-      ctx.fillStyle = "red";
-      ctx.fillRect(target.x, target.y, target.size, target.size);
-      requestAnimationFrame(draw);
+    // Food
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x, food.y, box, box);
+
+    let headX = snake[0].x;
+    let headY = snake[0].y;
+
+    if (direction === "LEFT") headX -= box;
+    if (direction === "UP") headY -= box;
+    if (direction === "RIGHT") headX += box;
+    if (direction === "DOWN") headY += box;
+
+    // Food gegessen
+    if (headX === food.x && headY === food.y) {
+        food = {
+            x: Math.floor(Math.random() * 20) * box,
+            y: Math.floor(Math.random() * 20) * box
+        };
+    } else {
+        snake.pop();
     }
 
-    draw();
-  </script>
+    const newHead = {x: headX, y: headY};
+
+    // Game Over
+    if (
+        headX < 0 || headY < 0 ||
+        headX >= canvas.width || headY >= canvas.height ||
+        collision(newHead, snake)
+    ) {
+        alert("Game Over!");
+        snake = [{x: 200, y: 200}];
+        direction = "RIGHT";
+        return;
+    }
+
+    snake.unshift(newHead);
+}
+
+function collision(head, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (head.x === array[i].x && head.y === array[i].y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+setInterval(draw, 100);
+</script>
+
 </body>
 </html>
